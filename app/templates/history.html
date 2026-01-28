@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    {% set total_routes = history|length %}
+    {% set ns = namespace(km=0) %}
+    {% for r in history %}{% set ns.km = ns.km + r.distance %}{% endfor %}
+
+    <div class="row mb-5 animate__animated animate__fadeInDown">
+        <div class="col-12 d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h6 class="text-uppercase text-muted fw-bold small mb-1">Mi Actividad</h6>
+                <h2 class="fw-bold mb-0">Historial de Rutas</h2>
+            </div>
+            <a href="{{ url_for('views.calculator') }}" class="btn btn-gradient-primary rounded-pill shadow-sm px-4">
+                <i class="fas fa-plus me-2"></i>Nueva Ruta
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <div class="history-stat-card">
+                <h3 class="fw-bold text-primary mb-0">{{ total_routes }}</h3>
+                <small class="text-muted text-uppercase fw-bold">Rutas Realizadas</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="history-stat-card">
+                <h3 class="fw-bold text-success mb-0">{{ "%.1f"|format(ns.km) }}</h3>
+                <small class="text-muted text-uppercase fw-bold">Kilómetros Totales</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="history-stat-card">
+                <h3 class="fw-bold text-warning mb-0"><i class="fas fa-check-circle"></i></h3>
+                <small class="text-muted text-uppercase fw-bold">Estado del Servicio</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-3 animate__animated animate__fadeIn">
+        <span class="badge bg-dark text-white border-0 py-2 px-3 rounded-pill">Todo</span>
+        <span class="badge bg-white text-muted border py-2 px-3 rounded-pill">Recientes</span>
+
+        {% if history|length > 0 %}
+            <button onclick="exportToPDF()" class="btn btn-sm btn-outline-danger rounded-pill ms-auto fw-bold">
+                <i class="fas fa-file-pdf me-1"></i> Exportar PDF
+            </button>
+            <button onclick="clearAllHistory()" class="btn btn-sm btn-link text-muted text-decoration-none">
+                Limpiar historial
+            </button>
+        {% endif %}
+    </div>
+
+    <div class="glass-card p-0 overflow-hidden animate__animated animate__fadeInUp">
+        {% if history|length > 0 %}
+            <div class="table-responsive">
+                <table id="historyTable" class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr>
+                            <th class="ps-4 py-3 text-muted small text-uppercase">Fecha</th>
+                            <th class="py-3 text-muted small text-uppercase">Trayecto</th>
+                            <th class="py-3 text-muted small text-uppercase">Distancia</th>
+                            <th class="py-3 text-muted small text-uppercase">Detalles</th>
+                            <th class="text-end pe-4 py-3 text-muted small text-uppercase">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for route in history %}
+                        <tr id="row-{{ route.id }}">
+                            <td class="ps-4">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold text-dark">{{ route.timestamp.split(' ')[0] }}</span>
+                                    <small class="text-muted" style="font-size:0.75rem;">{{ route.timestamp.split(' ')[1] }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2">{{ route.start }}</span>
+                                    <i class="fas fa-arrow-right mx-2 text-muted small"></i>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-2">{{ route.end }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark">{{ route.distance }} km</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                                    {{ route.weather }}
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button onclick="deleteRoute({{ route.id }})" class="btn btn-sm btn-light text-danger rounded-circle shadow-sm hover-scale" title="Eliminar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 text-primary">
+                        <i class="fas fa-route fa-3x"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">Sin rutas recientes</h4>
+                <p class="text-muted mb-4">Usa la calculadora para generar tu primer reporte.</p>
+                <a href="{{ url_for('views.calculator') }}" class="btn btn-primary rounded-pill px-4 shadow">Ir al Mapa</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    async function deleteRoute(id) {
+        Swal.fire({
+            title:'¿Eliminar?', icon:'warning', showCancelButton:true,
+            confirmButtonColor:'#EF4444', confirmButtonText:'Sí, borrar', cancelButtonText:'Cancelar'
+        }).then(async (r)=>{
+            if(r.isConfirmed) {
+                try {
+                    const res = await fetch(`/api/delete-route/${id}`, { method: 'DELETE' });
+                    if(res.ok) {
+                        document.getElementById(`row-${id}`).style.opacity = '0';
+                        setTimeout(()=>location.reload(), 500);
+                    }
+                } catch(e) {}
+            }
+        });
+    }
+
+    async function clearAllHistory() {
+        Swal.fire({
+            title:'¿Borrar historial completo?', text:'Esta acción no se puede deshacer', icon:'warning',
+            showCancelButton:true, confirmButtonColor:'#EF4444'
+        }).then(async (r)=>{
+            if(r.isConfirmed) {
+                await fetch(`/api/clear-history`, { method: 'DELETE' });
+                location.reload();
+            }
+        });
+    }
+
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(18); doc.text("Reporte de Rutas - PathFinder", 14, 22);
+        doc.setFontSize(10); doc.text("Generado: " + new Date().toLocaleDateString(), 14, 30);
+
+        doc.autoTable({
+            html: '#historyTable', startY: 40, theme: 'grid',
+            headStyles: { fillColor: [99, 102, 241] },
+            columns: [0, 1, 2, 3], // Ignorar columna de acciones
+            didParseCell: function(data) {
+                if(data.column.index === 4) data.cell.styles.display = 'none';
+            }
+        });
+        doc.save('PathFinder_Reporte.pdf');
+    }
+</script>
+{% endblock %}

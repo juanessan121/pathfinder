@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<div class="container-xxl px-4 py-4">
+
+    <div class="row mb-4 animate__animated animate__fadeInDown">
+        <div class="col-lg-12">
+            <h5 class="text-uppercase fw-bold small ls-1 mb-1 text-primary">Panel de Control</h5>
+            <h1 class="display-5 fw-bold mb-4">Hola, <span>{{ user }}</span></h1>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="dashboard-card card-hero primary p-4 h-100 position-relative overflow-hidden">
+                        <div class="position-relative z-1">
+                            <div class="metric-value counter" data-target="{{ stats.total_routes }}">0</div>
+                            <div class="metric-label opacity-75">Rutas Guardadas</div>
+                        </div>
+                        <i class="fas fa-route icon-bg"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card card-hero success p-4 h-100 position-relative overflow-hidden">
+                        <div class="position-relative z-1">
+                            <div class="metric-value"><span class="counter" data-target="{{ stats.total_km }}">0</span> <small class="fs-6">km</small></div>
+                            <div class="metric-label opacity-75">Distancia Recorrida</div>
+                        </div>
+                        <i class="fas fa-road icon-bg"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="dashboard-card card-hero dark p-4 h-100 position-relative overflow-hidden">
+                        <div class="d-flex justify-content-between align-items-center position-relative z-1 h-100">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <span class="metric-value me-2" id="realTemp">--°</span>
+                                    <i id="weatherIcon" class="fas fa-sync fa-spin text-warning fa-lg"></i>
+                                </div>
+                                <div class="metric-label text-warning" id="weatherDesc">Cargando clima...</div>
+                            </div>
+                            <div class="text-end opacity-75 small">
+                                <div><i class="fas fa-wind me-1"></i> <span id="windSpeed">--</span> km/h</div>
+                                <div><i class="fas fa-tint me-1"></i> <span id="humidity">--</span>% Hum</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-cloud-sun icon-bg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8 animate__animated animate__fadeInLeft animate__delay-1s">
+            <div class="dashboard-card p-0 overflow-hidden position-relative shadow-lg" style="height: 500px; border-radius: 20px;">
+
+                <div class="position-absolute top-0 start-0 p-3 w-100 d-flex justify-content-between align-items-start" style="z-index: 500; pointer-events: none;">
+                    <span class="badge bg-white text-success shadow-sm py-2 px-3 fw-bold border border-success border-opacity-25">
+                        <i class="fas fa-circle me-2" style="font-size:8px;"></i> Sistema Operativo
+                    </span>
+                </div>
+
+                <div id="dashboardMap" style="width: 100%; height: 100%;"></div>
+
+                <div class="position-absolute bottom-0 w-100 p-3 bg-white bg-opacity-95 border-top d-flex justify-content-between align-items-center backdrop-blur" style="z-index: 500;">
+                    <div>
+                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Tu Ubicación</small>
+                        <div class="fw-bold text-dark" id="locationText">
+                            <i class="fas fa-spinner fa-spin text-primary"></i> Iniciando...
+                        </div>
+                    </div>
+                    <button onclick="forceLocationUpdate()" class="btn btn-light rounded-circle shadow-sm text-primary hover-scale" style="width: 40px; height: 40px;" title="Actualizar GPS">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 animate__animated animate__fadeInRight animate__delay-1s">
+            <div class="dashboard-card h-100 p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0 text-dark">Sucesos Cercanos</h5>
+                    <span class="badge bg-danger bg-opacity-10 text-danger animate__animated animate__pulse animate__infinite">En vivo</span>
+                </div>
+
+                <div id="incidentsList" class="d-flex flex-column gap-3 overflow-auto flex-grow-1 px-1" style="max-height: 380px;">
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-satellite-dish fa-2x mb-3 opacity-25"></i>
+                        <p class="small">Sincronizando datos...</p>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('views.calculator') }}" class="btn btn-outline-primary w-100 rounded-pill py-2 fw-bold">
+                        Ver Mapa Completo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // --- CONFIGURACIÓN ---
+    let dashboardMap, userMarker;
+    // Coordenadas por defecto: Parque Montalvo, Ambato
+    const DEFAULT_LAT = -1.2417;
+    const DEFAULT_LNG = -78.6197;
+
+    const WEATHER_CODES = {
+        0: { label: 'Despejado', icon: 'fa-sun', color: 'text-warning' },
+        1: { label: 'Mayormente Despejado', icon: 'fa-cloud-sun', color: 'text-warning' },
+        2: { label: 'Parcialmente Nublado', icon: 'fa-cloud', color: 'text-muted' },
+        3: { label: 'Nublado', icon: 'fa-cloud', color: 'text-secondary' },
+        45: { label: 'Neblina', icon: 'fa-smog', color: 'text-muted' },
+        51: { label: 'Llovizna', icon: 'fa-cloud-rain', color: 'text-info' },
+        61: { label: 'Lluvia', icon: 'fa-cloud-showers-heavy', color: 'text-primary' },
+        95: { label: 'Tormenta', icon: 'fa-bolt', color: 'text-warning' }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        animateCounters();
+        startDataLoading(); // Iniciar proceso robusto de carga
+    });
+
+    function initMap() {
+        dashboardMap = L.map('dashboardMap', { zoomControl: false, attributionControl: false }).setView([DEFAULT_LAT, DEFAULT_LNG], 14);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(dashboardMap);
+    }
+
+    // --- LÓGICA ROBUSTA DE CARGA ---
+    function startDataLoading() {
+        document.getElementById('locationText').innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i> Buscando GPS...';
+
+        if (!navigator.geolocation) {
+            console.warn("Geolocalización no soportada.");
+            loadData(DEFAULT_LAT, DEFAULT_LNG, true); // Cargar default
+            return;
+        }
+
+        // Intentar obtener ubicación con timeout de 4 segundos
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                // Éxito GPS
+                loadData(pos.coords.latitude, pos.coords.longitude, false);
+            },
+            (err) => {
+                // Error GPS (Permiso denegado o timeout)
+                console.warn("Error GPS:", err.message);
+                loadData(DEFAULT_LAT, DEFAULT_LNG, true); // Cargar default sin molestar al usuario
+            },
+            { enableHighAccuracy: false, timeout: 4000, maximumAge: 60000 }
+        );
+    }
+
+    async function loadData(lat, lng, isDefault) {
+        // 1. Centrar Mapa
+        dashboardMap.flyTo([lat, lng], 15);
+
+        // 2. Marcador Usuario
+        if(userMarker) dashboardMap.removeLayer(userMarker);
+        const pulseHtml = `<div class="gps-ring-container"><div class="gps-ring"></div><div class="gps-dot"></div></div>`;
+        const pulseIcon = L.divIcon({ className: '', html: pulseHtml, iconSize: [24,24], iconAnchor: [12,12] });
+        userMarker = L.marker([lat, lng], {icon: pulseIcon}).addTo(dashboardMap);
+
+        // 3. Texto Ubicación
+        if(isDefault) {
+            document.getElementById('locationText').innerHTML = `<i class="fas fa-map-marker-alt text-muted me-2"></i> Ambato (Predeterminado)`;
+            // Aviso discreto (Toast)
+            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000});
+            Toast.fire({icon: 'info', title: 'Ubicación no detectada', text: 'Usando Ambato por defecto'});
+        } else {
+            // Intentar obtener nombre ciudad real
+            try {
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                const geoData = await geoRes.json();
+                const city = geoData.address.city || geoData.address.town || "Tu Ubicación";
+                document.getElementById('locationText').innerHTML = `<i class="fas fa-map-marker-alt text-success me-2"></i> ${city}`;
+            } catch(e) {
+                document.getElementById('locationText').innerHTML = "Coordenadas GPS";
+            }
+        }
+
+        // 4. Cargar Clima y Sucesos (API Open-Meteo)
+        try {
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`);
+            const wData = await weatherRes.json();
+
+            updateWeatherUI(wData.current);
+            generateRealIncidents(wData.current);
+        } catch(e) {
+            console.error("Error API Clima:", e);
+            document.getElementById('weatherDesc').innerText = "Sin datos";
+            // Generar incidentes genéricos si falla el clima
+            generateRealIncidents(null);
+        }
+    }
+
+    function updateWeatherUI(current) {
+        // Mapeo seguro del código de clima
+        const code = current.weather_code;
+        let info = { label: 'Variable', icon: 'fa-cloud', color: 'text-muted' };
+
+        // Buscar código aproximado
+        Object.keys(WEATHER_CODES).forEach(key => {
+            if (code >= key) info = WEATHER_CODES[key];
+        });
+
+        document.getElementById('realTemp').innerText = `${Math.round(current.temperature_2m)}°`;
+        document.getElementById('weatherDesc').innerText = info.label;
+        document.getElementById('humidity').innerText = current.relative_humidity_2m;
+        document.getElementById('windSpeed').innerText = current.wind_speed_10m;
+
+        const iconEl = document.getElementById('weatherIcon');
+        iconEl.className = `fas ${info.icon} ${info.color} fa-2x`;
+    }
+
+    function generateRealIncidents(weather) {
+        const list = document.getElementById('incidentsList');
+        list.innerHTML = '';
+        const incidents = [];
+
+        // Incidente Climático (Solo si tenemos datos)
+        if (weather) {
+            if (weather.weather_code >= 51) {
+                incidents.push({icon:'fa-car-crash', color:'danger', title:'Calzada Mojada', desc:'Lluvia detectada en la zona.', time:'Ahora'});
+            } else if (weather.wind_speed_10m > 20) {
+                incidents.push({icon:'fa-wind', color:'warning', title:'Vientos Fuertes', desc:'Precaución vehículos altos.', time:'Ahora'});
+            } else {
+                incidents.push({icon:'fa-check-circle', color:'success', title:'Buen Tiempo', desc:'Condiciones ideales para conducir.', time:'Ahora'});
+            }
+        }
+
+        // Incidentes Estáticos (Para rellenar y que no se vea vacío)
+        incidents.push({icon:'fa-hard-hat', color:'warning', title:'Obras Viales', desc:'Mantenimiento Av. Bolivariana.', time:'Hace 1h'});
+        incidents.push({icon:'fa-traffic-light', color:'primary', title:'Tráfico Moderado', desc:'Zona centro con afluencia.', time:'Hace 15m'});
+
+        // Renderizar
+        incidents.forEach(inc => {
+            const html = `
+                <div class="d-flex align-items-start p-3 rounded-3 bg-white border shadow-sm animate__animated animate__fadeInUp mb-2">
+                    <div class="rounded-circle bg-${inc.color} bg-opacity-10 p-2 me-3 text-${inc.color} d-flex align-items-center justify-content-center" style="width:40px;height:40px;min-width:40px;">
+                        <i class="fas ${inc.icon}"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <h6 class="fw-bold mb-0 text-dark" style="font-size:0.9rem;">${inc.title}</h6>
+                            <small class="text-muted" style="font-size:0.65rem;">${inc.time}</small>
+                        </div>
+                        <p class="mb-0 text-muted small lh-sm mt-1">${inc.desc}</p>
+                    </div>
+                </div>`;
+            list.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    function animateCounters() {
+        document.querySelectorAll('.counter').forEach(c => {
+            c.innerText = c.getAttribute('data-target');
+        });
+    }
+
+    function forceLocationUpdate() {
+        // Botón manual: Aquí si mostramos errores si falla
+        document.getElementById('locationText').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+        navigator.geolocation.getCurrentPosition(
+            (pos) => loadData(pos.coords.latitude, pos.coords.longitude, false),
+            (err) => {
+                Swal.fire('Error GPS', 'Asegúrate de permitir la ubicación o usar HTTPS.', 'error');
+                loadData(DEFAULT_LAT, DEFAULT_LNG, true);
+            },
+            { timeout: 5000 }
+        );
+    }
+</script>
+{% endblock %}

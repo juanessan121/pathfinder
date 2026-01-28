@@ -1,0 +1,87 @@
+========================================================================
+PROYECTO: PATHFINDER (Buscador de la Ruta Más Corta)
+FRAMEWORK: Flask (Python)
+========================================================================
+
+DESCRIPCIÓN DEL PROYECTO
+------------------------------------------------------------------------
+Este es una aplicación web desarrollada en Python utilizando el micro-framework
+Flask. Su objetivo principal es calcular y visualizar la ruta más corta entre
+dos puntos (nodos) dentro de un grafo o mapa, utilizando algoritmos de
+búsqueda de caminos (como Dijkstra o A*).
+
+La aplicación cuenta con una interfaz web amigable que permite al usuario
+seleccionar los puntos de origen y destino para visualizar el resultado.
+
+CARACTERÍSTICAS
+------------------------------------------------------------------------
+* Interfaz web interactiva.
+* Cálculo eficiente de la ruta más corta.
+* Visualización gráfica de nodos y conexiones.
+* Backend ligero construido con Flask.
+
+REQUISITOS PREVIOS
+------------------------------------------------------------------------
+Para ejecutar este proyecto necesitas tener instalado en tu sistema:
+
+1. Python 3.x (Asegúrate de marcar "Add Python to PATH" al instalar).
+2. pip (Gestor de paquetes de Python).
+
+INSTALACIÓN Y CONFIGURACIÓN
+------------------------------------------------------------------------
+Sigue estos pasos para poner en marcha el proyecto en tu entorno local:
+
+1. Descomprimir el archivo del proyecto (si lo descargaste como .zip) o
+   clonar el repositorio en tu carpeta de preferencia.
+
+2. Abrir una terminal o consola de comandos (CMD/PowerShell) en la carpeta
+   raíz del proyecto.
+
+3. (Opcional pero recomendado) Crear un entorno virtual:
+
+   Windows:
+      python -m venv venv
+      venv\Scripts\activate
+
+   Linux/Mac:
+      python3 -m venv venv
+      source venv/bin/activate
+
+4. Instalar las dependencias necesarias (Flask):
+
+      pip install flask
+
+   (Si tienes un archivo requirements.txt, usa: pip install -r requirements.txt)
+
+EJECUCIÓN
+------------------------------------------------------------------------
+Una vez instaladas las dependencias:
+
+1. En la terminal, ejecuta el archivo principal de la aplicación:
+
+      python app.py
+
+2. Verás un mensaje indicando que el servidor está corriendo, usualmente en:
+   http://127.0.0.1:5000/
+
+3. Abre tu navegador web favorito e ingresa esa dirección URL.
+
+ESTRUCTURA DEL PROYECTO
+------------------------------------------------------------------------
+/pathfinder
+  |-- static/           # Archivos CSS, imágenes y Scripts JS
+  |-- templates/        # Archivos HTML (Jinja2)
+  |-- app.py            # Archivo principal (Lógica de Flask y rutas)
+  |-- grafo.py          # (Opcional) Lógica del algoritmo de búsqueda
+  |-- README.txt        # Este archivo
+
+AUTORÍA Y CRÉDITOS
+------------------------------------------------------------------------
+Desarrollado por: [Tu Nombre o Tu Equipo]
+Asignatura: [Nombre de la Asignatura, ej. Algoritmos / Ingeniería de Sistemas]
+Fecha: Enero 2026
+
+NOTAS ADICIONALES
+------------------------------------------------------------------------
+Si encuentras errores al ejecutar el algoritmo, verifica que los nodos de
+inicio y fin existan dentro de la definición del grafo en el código.

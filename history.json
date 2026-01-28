@@ -1,0 +1,13 @@
+[
+    {
+        "start": "A",
+        "end": "B",
+        "distance": 2.5512,
+        "path": [
+            "A",
+            "B"
+        ],
+        "weather_summary": "Consultado",
+        "timestamp": "2026-01-03 16:39:14"
+    }
+]

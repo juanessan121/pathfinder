@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - PathFinder Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center">
+        <div class="glass-card p-5 animate__animated animate__fadeInUp" style="width: 100%; max-width: 450px;">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary">Crear Cuenta</h2>
+                <p class="text-muted">Únete a PathFinder Pro</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Elige un usuario</label>
+                    <input type="text" name="username" class="form-control form-control-glass" placeholder="Usuario" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted small">Define una contraseña</label>
+                    <input type="password" name="password" class="form-control form-control-glass" placeholder="******" required>
+                </div>
+                <button type="submit" class="btn btn-gradient-primary w-100 rounded-pill py-2 shadow">Registrarse</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <small>¿Ya tienes cuenta? <a href="{{ url_for('views.login') }}">Inicia sesión</a></small>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

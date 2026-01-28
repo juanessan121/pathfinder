@@ -1,0 +1,623 @@
+/* ARCHIVO: app/static/css/style.css */
+
+/* --- 1. VARIABLES & PALETA DE COLORES --- */
+:root {
+    /* Paleta solicitada */
+    --primary: #6366F1;       /* Indigo */
+    --success: #22C55E;       /* Verde Éxito */
+    --warning: #F59E0B;       /* Ambar Alerta */
+    --danger: #EF4444;        /* Rojo Peligro */
+    --dark: #1E293B;          /* Slate Dark */
+    --light: #F8FAFC;         /* Fondo General */
+    --white: #FFFFFF;         /* Fondo Cards */
+
+    /* Textos */
+    --text-main: #334155;
+    --text-muted: #64748B;
+
+    /* Gradientes Hero */
+    --grad-primary: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+    --grad-success: linear-gradient(135deg, #16A34A 0%, #4ADE80 100%);
+    --grad-dark: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+
+    /* Sombras & Bordes */
+    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --border-light: 1px solid rgba(0,0,0,0.05);
+
+    /* Vidrio */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --input-bg: #ffffff;
+
+    /* Mapa */
+    --map-filter: none;
+}
+
+/* --- MODO OSCURO --- */
+[data-theme="dark"] {
+    --light: #0F172A;         /* Fondo muy oscuro */
+    --white: #1E293B;         /* Paneles oscuros */
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+    --border-light: 1px solid rgba(255,255,255,0.05);
+
+    --glass-bg: rgba(30, 41, 59, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --input-bg: #0f172a;
+
+    /* Invertir mapa para modo noche inteligente */
+    --map-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* --- ESTILOS BASE --- */
+body {
+    background-color: var(--light);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+.navbar-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1050;
+}
+.nav-link { color: var(--text-main) !important; font-weight: 500; }
+
+/* --- TIPOGRAFÍA --- */
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
+}
+.metric-label {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+/* --- TARJETAS (CARDS) --- */
+.dashboard-card {
+    background: var(--white);
+    border: var(--border-light);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Tarjetas Hero (KPIs) */
+.card-hero { color: white; border: none; }
+.card-hero.primary { background: var(--grad-primary); }
+.card-hero.success { background: var(--grad-success); }
+.card-hero.dark { background: var(--grad-dark); }
+
+.card-hero .icon-bg {
+    position: absolute;
+    right: -15px; bottom: -15px;
+    font-size: 6rem; opacity: 0.15;
+    transform: rotate(-15deg);
+}
+
+/* Tarjeta Alerta */
+.card-alert {
+    background: var(--white);
+    border-left: 4px solid var(--warning);
+}
+
+/* --- LISTA DE SUCESOS --- */
+.incident-item {
+    background: var(--white);
+    border-left: 3px solid transparent;
+    transition: background 0.2s;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+.incident-item:hover { background: rgba(0,0,0,0.02); }
+
+.severity-high { border-left-color: var(--danger); }
+.severity-medium { border-left-color: var(--warning); }
+.severity-low { border-left-color: var(--success); }
+
+/* --- MAPA & ICONOS --- */
+#dashboardMap { z-index: 1; border-radius: 0 0 20px 20px; }
+
+/* Filtro Oscuro para Mapa */
+.leaflet-layer, .leaflet-control-attribution { filter: var(--map-filter); }
+.leaflet-marker-icon, .leaflet-popup, .leaflet-tooltip { filter: none !important; }
+[data-theme="dark"] .leaflet-popup-content-wrapper { background: var(--white); color: var(--text-main); }
+
+/* Iconos Personalizados */
+.map-icon-container {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    background: var(--white);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    border: 2px solid white;
+    transition: transform 0.2s ease;
+}
+.map-icon-container:hover { transform: scale(1.25); z-index: 1000 !important; }
+
+/* Variantes de Iconos Mapa */
+.icon-traffic { color: var(--danger); background: #FEF2F2; border-color: var(--danger); }
+.icon-works { color: var(--warning); background: #FFFBEB; border-color: var(--warning); }
+.icon-police { color: var(--primary); background: #EEF2FF; border-color: var(--primary); }
+.icon-weather { color: #0EA5E9; background: #F0F9FF; border-color: #0EA5E9; }
+
+/* Radar Usuario */
+.gps-ring-container { position: relative; width: 24px; height: 24px; }
+.gps-dot { width: 12px; height: 12px; background: var(--primary); border-radius: 50%; position: absolute; top: 6px; left: 6px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.gps-ring {
+    border: 3px solid var(--primary); border-radius: 50%; height: 100%; width: 100%;
+    position: absolute; top: 0; left: 0; animation: pulsate 2s infinite; opacity: 0;
+}
+@keyframes pulsate { 0% {transform: scale(0.5); opacity: 0;} 50% {opacity: 0.8;} 100% {transform: scale(1.5); opacity: 0;} }
+
+/* Botones Acción */
+.btn-action {
+    background: var(--grad-primary);
+    color: white; border: none;
+    transition: all 0.3s;
+}
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    color: white;
+}
+
+/* Sugerencias de Búsqueda */
+.suggestions-list {
+    background: var(--white);
+    border: 1px solid var(--glass-border);
+    border-radius: 0 0 10px 10px;
+    box-shadow: var(--shadow-card);
+}
+.suggestion-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--glass-border);
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-main);
+}
+.suggestion-item:hover { background: rgba(99, 102, 241, 0.1); border-left: 3px solid var(--primary); }
+/* --- UI MAPA MEJORADA --- */
+
+/* 1. Panel Step-by-Step */
+.step-section {
+    position: relative;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+.step-section.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(0.8);
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+.step-number {
+    width: 28px; height: 28px;
+    background: var(--dark);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 0.85rem;
+    margin-right: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.3s;
+}
+.step-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+.step-active .step-number { background: var(--primary); transform: scale(1.1); }
+.step-active .step-title { color: var(--primary); }
+
+/* 2. Ruta con Personalidad (Neon Glow) */
+.route-glow {
+    stroke: var(--primary);
+    stroke-width: 6;
+    stroke-opacity: 0.6;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+    stroke-linecap: round;
+}
+.route-core {
+    stroke: var(--primary);
+    stroke-width: 3;
+}
+
+/* 3. Leyenda Flotante */
+.map-legend {
+    position: absolute; bottom: 30px; right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    padding: 12px 16px; border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    z-index: 1000; font-size: 0.75rem;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.legend-item { display: flex; align-items: center; margin-bottom: 5px; font-weight: 600; color: var(--text-main); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 4px rgba(0,0,0,0.2); }
+
+/* 4. Card de Resultado Flotante */
+.result-card-float {
+    position: absolute; top: 100px; right: 20px;
+    width: 280px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
+    z-index: 1000; padding: 20px;
+    border-left: 5px solid var(--primary);
+    display: none; /* Oculto por defecto */
+    animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Inputs mejorados */
+.form-control-glass {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+}
+.form-control-glass:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+/* ARCHIVO: app/static/css/style.css */
+
+/* --- 1. VARIABLES & PALETA DE COLORES --- */
+:root {
+    /* Paleta Principal */
+    --primary: #6366F1;       /* Indigo */
+    --primary-dark: #4F46E5;
+    --success: #22C55E;       /* Verde Éxito */
+    --warning: #F59E0B;       /* Ambar Alerta */
+    --danger: #EF4444;        /* Rojo Peligro */
+    --dark: #1E293B;          /* Slate Dark */
+    --light: #F8FAFC;         /* Fondo General */
+    --white: #FFFFFF;         /* Fondo Cards */
+
+    /* Textos */
+    --text-main: #334155;
+    --text-muted: #64748B;
+
+    /* Gradientes */
+    --grad-primary: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+    --grad-success: linear-gradient(135deg, #16A34A 0%, #4ADE80 100%);
+    --grad-dark: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+
+    /* Sombras & Efectos */
+    --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --map-filter: none;
+}
+
+/* MODO OSCURO */
+[data-theme="dark"] {
+    --light: #0F172A;
+    --white: #1E293B;
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+    --glass-bg: rgba(30, 41, 59, 0.95);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --map-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* --- ESTILOS BASE --- */
+body {
+    background-color: var(--light);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+/* Navbar Glass */
+.navbar-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    z-index: 1050;
+}
+.navbar-brand { font-weight: 700; color: var(--text-main) !important; }
+.nav-link { color: var(--text-main) !important; font-weight: 500; }
+
+/* --- UTILIDADES VISUALES --- */
+.hover-scale { transition: transform 0.2s; }
+.hover-scale:hover { transform: scale(1.02); }
+
+.glass-card {
+    background: var(--white);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+}
+
+/* --- MAPA & PLANIFICADOR (UI MEJORADA) --- */
+.sidebar-float {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--glass-border);
+}
+
+/* Panel Step-by-Step */
+.step-header {
+    display: flex; align-items: center;
+    font-weight: 600; color: var(--text-main);
+    margin-bottom: 1rem; font-size: 0.85rem; letter-spacing: 0.5px;
+}
+.step-number {
+    background: var(--dark); color: white;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; margin-right: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background 0.3s;
+}
+.step-section {
+    position: relative; margin-bottom: 1.5rem;
+    transition: opacity 0.3s, filter 0.3s;
+}
+.step-section.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+
+/* Inputs Estilizados */
+.form-control-glass {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+}
+.form-control-glass:focus {
+    background: var(--white);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Ruta con Personalidad (Glow) */
+.custom-route-line {
+    stroke: var(--primary);
+    stroke-width: 6;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+    stroke-linecap: round;
+}
+
+/* Leyenda Flotante */
+.map-legend {
+    position: absolute; bottom: 30px; right: 20px;
+    background: var(--white);
+    padding: 12px 18px; border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    z-index: 1000; font-size: 0.8rem;
+    border: 1px solid var(--glass-border);
+}
+.legend-item { display: flex; align-items: center; margin-bottom: 6px; font-weight: 500; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
+
+/* Card de Resultado Flotante */
+.result-card-float {
+    position: absolute; top: 90px; right: 20px; width: 300px;
+    background: var(--white); border-radius: 16px;
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+    z-index: 1000; padding: 25px;
+    border-left: 6px solid var(--primary);
+    display: none;
+    animation: slideInRight 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+@keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Sugerencias de Búsqueda */
+.suggestions-list {
+    position: absolute; width: 100%; top: 100%; left: 0; z-index: 1050;
+    background: var(--white); border-radius: 0 0 10px 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1); overflow: hidden;
+}
+.suggestion-item {
+    padding: 12px 15px; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-size: 0.9rem;
+}
+.suggestion-item:hover { background: rgba(99, 102, 241, 0.05); border-left: 3px solid var(--primary); }
+
+/* --- HISTORIAL & DOCS --- */
+.history-stat-card {
+    background: var(--white); border-radius: 16px; padding: 20px;
+    box-shadow: var(--shadow-card); text-align: center;
+    border: 1px solid rgba(0,0,0,0.03); transition: transform 0.3s;
+}
+.history-stat-card:hover { transform: translateY(-5px); }
+
+.route-badge {
+    font-weight: 600; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem;
+    background: var(--light); border: 1px solid rgba(0,0,0,0.1);
+}
+
+.step-card {
+    background: var(--white); border-radius: 16px; padding: 2.5rem 1.5rem;
+    box-shadow: var(--shadow-card); transition: all 0.3s; height: 100%; border: 1px solid transparent;
+}
+.step-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+
+.step-icon-circle {
+    width: 70px; height: 70px; background: var(--grad-primary); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin-bottom: 1.5rem;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Filtro Mapa Oscuro */
+.leaflet-layer, .leaflet-control-attribution { filter: var(--map-filter); }
+.leaflet-marker-icon, .leaflet-popup, .leaflet-tooltip { filter: none !important; }
+/* --- AÑADE ESTO A TU STYLE.CSS --- */
+
+/* Estilos para el Autocompletado tipo Google Maps */
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 9999;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-top: none;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background-color: #f8fafc;
+    border-left: 3px solid var(--primary);
+    padding-left: 13px; /* Compensar el borde */
+}
+
+.suggestion-item i {
+    color: var(--text-muted);
+    margin-right: 12px;
+}
+
+.suggestion-item b {
+    color: var(--dark);
+    font-size: 0.9rem;
+}
+
+.suggestion-item small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-left: 24px; /* Alinear con el texto */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Scrollbar fina para la lista */
+.suggestions-list::-webkit-scrollbar { width: 6px; }
+.suggestions-list::-webkit-scrollbar-track { background: #f1f1f1; }
+.suggestions-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+/* --- CORRECCIONES MODO OSCURO (BOOTSTRAP OVERRIDE) --- */
+[data-theme="dark"] .text-dark {
+    color: var(--text-main) !important;
+}
+[data-theme="dark"] .bg-white {
+    background-color: var(--white) !important;
+}
+[data-theme="dark"] .bg-light {
+    background-color: rgba(255,255,255,0.05) !important;
+}
+[data-theme="dark"] .card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .list-group-item {
+    background-color: var(--white);
+    color: var(--text-main);
+    border-color: rgba(255,255,255,0.05);
+}
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+[data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 {
+    color: #F1F5F9 !important;
+}
+[data-theme="dark"] .text-muted {
+    color: #94A3B8 !important;
+}
+[data-theme="dark"] .table-hover tbody tr:hover {
+    color: var(--text-main);
+    background-color: rgba(255,255,255,0.05);
+}
+/* --- ESTILOS ESPECÍFICOS PARA MAPA EN MODO OSCURO --- */
+
+/* 1. Invertir colores del mapa (Efecto Modo Noche) */
+[data-theme="dark"] .leaflet-layer {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+/* Evitar que los controles y popups se inviertan */
+[data-theme="dark"] .leaflet-control,
+[data-theme="dark"] .leaflet-popup-content-wrapper,
+[data-theme="dark"] .leaflet-popup-tip {
+    filter: invert(0%); /* Reset */
+    background: var(--dark);
+    color: var(--text-main);
+}
+
+/* 2. Ajuste de Inputs y Listas en el Mapa */
+[data-theme="dark"] .form-control {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+[data-theme="dark"] .form-control:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
+    color: white;
+}
+[data-theme="dark"] .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* 3. Autocompletado y Sugerencias */
+[data-theme="dark"] .suggestions-list {
+    background-color: var(--white); /* Usa el color de fondo oscuro definido en variables */
+    border-color: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .suggestion-item {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+[data-theme="dark"] .suggestion-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .suggestion-item b {
+    color: #fff;
+}
+
+/* 4. Paneles y Botones */
+[data-theme="dark"] .sidebar-float,
+[data-theme="dark"] .map-legend,
+[data-theme="dark"] .result-card-float {
+    background: rgba(30, 41, 59, 0.95); /* Color oscuro translúcido */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .navbar-glass {
+    background: rgba(30, 41, 59, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .btn-white {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

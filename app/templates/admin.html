@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="glass-card p-5 animate__animated animate__fadeIn">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-danger"><i class="fas fa-user-shield me-2"></i>Panel de Administrador</h2>
+            <span class="badge bg-danger">Zona Restringida</span>
+        </div>
+        
+        <p class="mb-4">Gestión de usuarios registrados en la base de datos.</p>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Rutas Guardadas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.id }}</td>
+                        <td class="fw-bold">{{ u.username }}</td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="badge bg-warning text-dark">Admin</span>
+                            {% else %}
+                                <span class="badge bg-info">Usuario</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.routes|length }}</td>
+                        <td>
+                            {% if u.username != 'admin' and u.id != current_user_id %}
+                            <a href="{{ url_for('views.delete_user', user_id=u.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este usuario y todos sus datos?')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">Protegido</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
