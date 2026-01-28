@@ -51,7 +51,7 @@ Sigue estos pasos para poner en marcha el proyecto en tu entorno local:
 
       pip install flask
 
-   (Si tienes un archivo requirements.txt, usa: pip install -r requirements.txt)
+   pip install -r requirements.txt
 
 EJECUCIÓN
 ------------------------------------------------------------------------
@@ -77,8 +77,7 @@ ESTRUCTURA DEL PROYECTO
 
 AUTORÍA Y CRÉDITOS
 ------------------------------------------------------------------------
-Desarrollado por: [Tu Nombre o Tu Equipo]
-Asignatura: [Nombre de la Asignatura, ej. Algoritmos / Ingeniería de Sistemas]
+Desarrollado por: Juan Sandoval 
 Fecha: Enero 2026
 
 NOTAS ADICIONALES
